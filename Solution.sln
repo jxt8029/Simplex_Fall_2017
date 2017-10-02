@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicX", "BasicX\BasicX.vcxproj", "{E745E25C-0143-42AC-A486-1395A4C972AE}"
 EndProject
@@ -121,6 +121,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "24_Physics", "24_Physics\24_Physics.vcxproj", "{58CB6636-1057-466F-AB91-BADB3395421A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_MeshClass_Del", "12_MeshClass_Del\12_MeshClass_Del.vcxproj", "{8D7AB7A9-4CB7-48DD-B29E-4310BE8A0DBC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_MeshClass - Copy", "12_MeshClass - Copy\12_MeshClass - Copy.vcxproj", "{6112CD15-C066-472E-835B-0240DD6ED653}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -278,6 +280,10 @@ Global
 		{8D7AB7A9-4CB7-48DD-B29E-4310BE8A0DBC}.Debug|x86.Build.0 = Debug|Win32
 		{8D7AB7A9-4CB7-48DD-B29E-4310BE8A0DBC}.Release|x86.ActiveCfg = Release|Win32
 		{8D7AB7A9-4CB7-48DD-B29E-4310BE8A0DBC}.Release|x86.Build.0 = Release|Win32
+		{6112CD15-C066-472E-835B-0240DD6ED653}.Debug|x86.ActiveCfg = Debug|Win32
+		{6112CD15-C066-472E-835B-0240DD6ED653}.Debug|x86.Build.0 = Debug|Win32
+		{6112CD15-C066-472E-835B-0240DD6ED653}.Release|x86.ActiveCfg = Release|Win32
+		{6112CD15-C066-472E-835B-0240DD6ED653}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,5 +330,9 @@ Global
 		{44D2C07B-798D-461B-9019-DFB240593888} = {5D1FB011-A2D8-4107-890B-BF1ACD0C0994}
 		{58CB6636-1057-466F-AB91-BADB3395421A} = {E0A09DA7-AF20-49C2-84DC-481ADDD01DCA}
 		{8D7AB7A9-4CB7-48DD-B29E-4310BE8A0DBC} = {E0A09DA7-AF20-49C2-84DC-481ADDD01DCA}
+		{6112CD15-C066-472E-835B-0240DD6ED653} = {E0A09DA7-AF20-49C2-84DC-481ADDD01DCA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C3768390-14F3-4AF1-8C7D-D40806B57F13}
 	EndGlobalSection
 EndGlobal
