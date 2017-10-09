@@ -62,7 +62,29 @@ void Application::Display(void)
 
 
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	static int current = 0; //current stop
+	static int next = 1; //next stop
+	static int wholeSeconds = 0; //number of entire seconds passed, used to check for stop updates
+
+	float timer = fTimer - wholeSeconds; //timer for checking when the next whole second is reached
+
+	//update all variables when second has passed
+	if (timer >= 1.f) {
+		current++;
+		next++;
+		wholeSeconds++;
+	}
+
+	//reset values to start if the end of the stops is reached
+	if (current > 10) current = 0;
+	if (next > 10) next = 0;
+
+	//find decimal portion of timer value
+	float lerpVal = fTimer - (long)(fTimer);
+
+	//find lerp value using current stop, next stop, and decimal portion of timer
+	//moves between stops at an even pace for one second (when variables and stops update)
+	v3CurrentPos = glm::lerp(m_stopsList[current], m_stopsList[next], lerpVal);
 	//-------------------
 	
 
