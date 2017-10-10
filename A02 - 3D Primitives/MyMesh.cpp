@@ -276,7 +276,29 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	vector3 coneTop(0, a_fHeight / 2, 0); //vertex at top of cone
+	vector3 baseCenter(0, -a_fHeight / 2, 0); //vertex at bottom of cone (centered on the bottom face)
+	vector3* basePoints = new vector3[a_nSubdivisions + 2]; //vertices of bottom face
+	basePoints[0] = baseCenter; //set center point as first bottom face vertex
+	float angle = 0;
+
+	for (int i = 1; i < a_nSubdivisions + 2; i++) //goes until +2 to account for coneTop and baseCenter
+	{
+		angle += ((2 * PI) / a_nSubdivisions); //calculate new angle based on subdivisions
+		basePoints[i] = vector3(cos(angle) * a_fRadius, -a_fHeight / 2, sin(angle) * a_fRadius); //calculate outer base vertices
+	}
+
+	for(int i = 1; i < a_nSubdivisions; i++)
+	{
+		AddTri(basePoints[0], basePoints[i], basePoints[i + 1]); //bottom face's triangles
+		AddTri(basePoints[i], coneTop, basePoints[i + 1]); //side triangles
+	}
+
+	//fill in gap at end of cone where for loop doesn't fill
+	AddTri(basePoints[0], basePoints[a_nSubdivisions], basePoints[1]);
+	AddTri(basePoints[a_nSubdivisions], coneTop, basePoints[1]);
+	
+	delete[] basePoints;
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +322,37 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	vector3 topCenter(0, a_fHeight / 2, 0); //top vertex in center of circle
+	vector3 baseCenter(0, -a_fHeight / 2, 0); //bottom vertex in center of circle
+	vector3* basePoints = new vector3[a_nSubdivisions + 1]; //vertices for bottom face
+	vector3* topPoints = new vector3[a_nSubdivisions + 1]; //vertices for top face
+	basePoints[0] = baseCenter; //set each array's first index equal to their respective center points
+	topPoints[0] = topCenter;
+	float angle = 0;
+
+	for(int i = 1; i < a_nSubdivisions + 1; i++)
+	{
+		angle += ((2 * PI) / a_nSubdivisions); //calculate new angle based on number of subdivisions
+		basePoints[i] = vector3(cos(angle) * a_fRadius, -a_fHeight / 2, -sin(angle) * a_fRadius); //calculate base face's vertices
+
+		//calculate top face's vertices by adding the height in y to the bottom face's vertices
+		topPoints[i] = basePoints[i] + vector3(0, a_fHeight, 0); 
+	}
+
+	for(int i = 1; i < a_nSubdivisions; i++)
+	{
+		AddTri(basePoints[0], basePoints[i + 1], basePoints[i]); //base triangles
+		AddTri(topPoints[0], topPoints[i], topPoints[i + 1]); //top triangles
+		AddQuad(basePoints[i], basePoints[i + 1], topPoints[i], topPoints[i + 1]); //side quads
+	}
+
+	//again, fill in the space not covered in the for loop
+	AddTri(basePoints[0], basePoints[1], basePoints[a_nSubdivisions]);
+	AddTri(topPoints[0], topPoints[a_nSubdivisions], topPoints[1]);
+	AddQuad(basePoints[a_nSubdivisions], basePoints[1], topPoints[a_nSubdivisions], topPoints[1]);
+
+	delete[] basePoints;
+	delete[] topPoints;
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +382,28 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	vector3* outerBasePoints = new vector3[a_nSubdivisions + 2]; //outer vertices of bottom face
+	vector3* outerTopPoints = new vector3[a_nSubdivisions + 2]; //outer vertices of top face
+	vector3* innerBasePoints = new vector3[a_nSubdivisions + 2]; //inner vertices of bottom face
+	vector3* innerTopPoints = new vector3[a_nSubdivisions + 2];	//inner vertices of top face
+	float angle = 0;
+
+	for(int i = 0; i < a_nSubdivisions + 1; i++)
+	{
+		angle += ((2 * PI) / a_nSubdivisions); //calculate angle based on number of subdivisions
+		outerBasePoints[i] = vector3(cos(angle) * a_fOuterRadius, -a_fHeight / 2, sin(angle) * a_fOuterRadius); //calculate outer base vertices
+		innerBasePoints[i] = vector3(cos(angle) * a_fInnerRadius, -a_fHeight / 2, sin(angle) * a_fInnerRadius); //calculate inner base vertices
+		outerTopPoints[i] = outerBasePoints[i] + vector3(0, a_fHeight, 0); //get both inner and outer vertices by adding height in y to base vertices
+		innerTopPoints[i] = innerBasePoints[i] + vector3(0, a_fHeight, 0);
+	}
+
+	for(int i = 0; i < a_nSubdivisions; i++)
+	{
+		AddQuad(outerBasePoints[i], outerBasePoints[i + 1], innerBasePoints[i], innerBasePoints[i + 1]); //bottom face
+		AddQuad(outerTopPoints[i + 1], outerTopPoints[i], innerTopPoints[i + 1], innerTopPoints[i]); //top face
+		AddQuad(outerBasePoints[i + 1], outerBasePoints[i], outerTopPoints[i + 1], outerTopPoints[i]); //outer faces
+		AddQuad(innerBasePoints[i], innerBasePoints[i + 1], innerTopPoints[i], innerTopPoints[i + 1]); //inner faces
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -387,7 +460,9 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	//I had no luck making a shape that remotely resembled a sphere so I scrapped what I had
+
 	// -------------------------------
 
 	// Adding information about color
