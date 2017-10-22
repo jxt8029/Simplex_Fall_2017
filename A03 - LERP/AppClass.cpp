@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	//m_sProgrammer = "Jake Toporoff - jxt8029@rit.edu"
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -65,17 +65,48 @@ void Application::Display(void)
 	/*
 		The following offset will orient the orbits as in the demo, start without it to make your life easier.
 	*/
-	//m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
+	m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
 
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 90.0f, AXIS_X));
+		//Get a timer
+		static float fTimer = 0;	//store the new timer
+		static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+		fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
-		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
-		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
+		static int wholeSeconds = 0; //number of entire seconds passed, used to check for stop updates
+		static int current = 0; //current vertex
+		static int next = 1; //next vertex
 
+		float timer = fTimer - wholeSeconds; //timer for checking when the next whole second is reached
+
+		//update all variables every second
+		if (timer >= 1.f) {
+			current++;
+			next++;
+			wholeSeconds++;
+		}
+
+		//find decimal portion of timer value
+		float lerpVal = fTimer - (long)(fTimer);
+
+		//find radius for every torus, first is .95 and every one after that is .5 greater
+		float radius = .95f + (.5f * i);
+
+		float incrementAngle = (2 * PI) / (i + 3); //angle to increment based on number of sides on the torus
+		float angle1 = incrementAngle * current; //increment based on current vertex
+		float angle2 = incrementAngle * next; //have next increment be the next vertex of the shape
+
+		//calculate the current and next positions
+		vector3 v3CurrentPos = vector3(cos(angle1) * radius, sin(angle1) * radius, 0);
+		vector3 v3NextPos = vector3(cos(angle2) * radius, sin(angle2) * radius, 0);
+
+		//lerp between current and next over 1 second
+		vector3 spherePos = glm::lerp(v3CurrentPos, v3NextPos, lerpVal);
+
+		matrix4 m4Model = glm::translate(m4Offset, spherePos);
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
 	}
