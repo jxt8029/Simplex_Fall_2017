@@ -57,21 +57,41 @@ void Application::Display(void)
 		break;
 	case 2:
 		m_pCamera->ResetCamera();
+
+		// Change to orthographic perspective
+		m_pCamera->SetPerspective(false);
 		break;
 	case 3:
 		m_pCamera->ResetCamera();
+
+		// Set position to be looking at objects from the side while tilted 90 degrees
+		m_pCamera->SetPositionTargetAndUp(vector3(30.0f, 0.0f, 0.0f), vector3(), vector3(0.0f, 0.0f, -1.0f));
 		break;
 	case 4:
 		m_pCamera->ResetCamera();
+
+		// Set position to be looking at objects from behind
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -15.0f), vector3(), vector3(0.0f, 1.0f, 0.0f));
 		break;
 	case 5:
 		m_pCamera->ResetCamera();
+
+		// Same as 4, except the near clipping plane is moved in front of the cone (The cone won't appear now)
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -15.0f), vector3(), vector3(0.0f, 1.0f, 0.0f));
+		m_pCamera->SetNearFar(vector2(5.0f, 1000.0f));
 		break;
 	case 6:
 		m_pCamera->ResetCamera();
+
+		// Same as 4 and 5, except the far clipping plane is moved in front of the back torus (The red torus won't appear now)
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -15.0f), vector3(), vector3(0.0f, 1.0f, 0.0f));
+		m_pCamera->SetNearFar(vector2(0.001f, 10.0f));
 		break;
 	case 7:
 		m_pCamera->ResetCamera();
+
+		// Same as the default view (1), except the camera is flipped upside down
+		m_pCamera->SetUp(vector3(0.0f, -1.0f, 0.0f));
 		break;
 	}
 
