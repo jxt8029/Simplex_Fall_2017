@@ -369,6 +369,11 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
+
+	//Code I had previously was incredibly wrong; removed it all
+
+
+
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -385,6 +390,35 @@ void Application::ProcessKeyboard(void)
 
 	if (fMultiplier)
 		fSpeed *= 5.0f;
+
+	//Camera's position
+	vector3 position = m_pCamera->GetPosition();
+
+	//Camera's forward vector
+	vector3 forward = m_pCamera->GetTarget() - m_pCamera->GetPosition();
+
+	//Camera's right vector (using cross product between up and forward to find its direction)
+	vector3 right = glm::normalize(glm::cross(m_pCamera->GetUp(), forward));
+
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) //Move forward
+	{
+		position += forward * fSpeed;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) //Move backward
+	{
+		position -= forward * fSpeed;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) //Move left
+	{
+		position += right * fSpeed;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) //Move right
+	{
+		position -= right * fSpeed;
+	}
+
+	//Set camera's position, target (position + forward vector), and up (up - position) -> this stops the camera from rotating oddly while moving sideways
+	m_pCamera->SetPositionTargetAndUp(position, position + forward, m_pCamera->GetUp() - position);
 #pragma endregion
 }
 //Joystick

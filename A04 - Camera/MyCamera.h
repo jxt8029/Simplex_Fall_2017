@@ -100,7 +100,7 @@ public:
 	ARGUMENTS: ---
 	OUTPUT: position of the camera
 	*/
-	vector3 GetPosition(void);
+	vector3 GetPosition(void) { return m_v3Position; }
 
 	/*
 	USAGE: Sets the position of the camera
@@ -114,7 +114,7 @@ public:
 	ARGUMENTS: ---
 	OUTPUT: position of the camera
 	*/
-	vector3 GetTarget(void);
+	vector3 GetTarget(void) { return m_v3Target; }
 
 	/*
 	USAGE: Sets the position of the camera
@@ -128,7 +128,7 @@ public:
 	ARGUMENTS: ---
 	OUTPUT: position of the camera
 	*/
-	vector3 GetUp(void);
+	vector3 GetUp(void) { return m_v3Up; }
 
 	/*
 	USAGE: Sets Perspective Camera
