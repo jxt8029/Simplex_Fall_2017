@@ -370,9 +370,18 @@ void Application::CameraRotation(float a_fSpeed)
 	}
 	//Change the Yaw and the Pitch of the camera
 
-	//Code I had previously was incredibly wrong; removed it all
+	//get rotation in yaw and pitch
+	camRot = glm::angleAxis(fAngleY, m_pCamera->GetUp()) * glm::angleAxis(fAngleX, AXIS_X);
 
+	//convert target position to a quaternion
+	vector3 target = m_pCamera->GetTarget();
+	quaternion qTarget = quaternion(0, target.x, target.y, target.z);
 
+	//get result of rotation (conjugate multiplies x, y, and z by -1)
+	quaternion result = camRot * qTarget * glm::conjugate(camRot);
+
+	//set target based on result rotation
+	m_pCamera->SetTarget(vector3(result.x, result.y, result.z));
 
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
@@ -418,7 +427,7 @@ void Application::ProcessKeyboard(void)
 	}
 
 	//Set camera's position, target (position + forward vector), and up (up - position) -> this stops the camera from rotating oddly while moving sideways
-	m_pCamera->SetPositionTargetAndUp(position, position + forward, m_pCamera->GetUp() - position);
+	m_pCamera->SetPositionTargetAndUp(position, position + forward, m_pCamera->GetUp());
 #pragma endregion
 }
 //Joystick
