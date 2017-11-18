@@ -276,16 +276,152 @@ void MyRigidBody::AddToRenderList(void)
 
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	/*
-	Your code goes here instead of this comment;
+	float radius;
+	float radiusOther;
 
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
-	*/
+	vector3 halfWidth = GetHalfWidth();
+	vector3 halfWidthOther = a_pOther->GetHalfWidth();
+
+	vector3 axes[3];
+	vector3 axesOther[3];
+	axes[0] = vector3(GetModelMatrix() * vector4(AXIS_X, 0));
+	axes[1] = vector3(GetModelMatrix() * vector4(AXIS_Y, 0));
+	axes[2] = vector3(GetModelMatrix() * vector4(AXIS_Z, 0));
+	axesOther[0] = vector3(a_pOther->GetModelMatrix() * vector4(AXIS_X, 0));
+	axesOther[1] = vector3(a_pOther->GetModelMatrix() * vector4(AXIS_Y, 0));
+	axesOther[2] = vector3(a_pOther->GetModelMatrix() * vector4(AXIS_Z, 0));
+
+
+	//Calculate rotation matrices
+	matrix3 rotMat;
+	matrix3 rotMatAbsVal;
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			rotMat[i][j] = glm::dot(axes[i], axesOther[j]);
+			rotMatAbsVal[i][j] = glm::abs(rotMat[i][j]) + FLT_EPSILON; //epsilon accounts for error when their two edges are parallel
+		}
+	}
+
+	//Find translation vector and bring into first object's coordinate frame
+	vector3 translation = a_pOther->GetCenterGlobal() - GetCenterGlobal();
+	translation = vector3(glm::dot(translation, axes[0]), glm::dot(translation, axes[1]), glm::dot(translation, axes[2]));
+
+	//Test axes L = Ax, L = Ay, L = Az
+	for (int i = 0; i < 3; i++) {
+		radiusOther = halfWidthOther[0] * rotMatAbsVal[0][i] + halfWidthOther[1] * rotMatAbsVal[1][i] + halfWidthOther[2] * rotMatAbsVal[2][i];
+		radius = halfWidth[i];
+		if(glm::abs(translation[0] * rotMat[0][i] + translation[1] * rotMat[1][i] + translation[2] * rotMat[2][i]) > radius + radiusOther)
+		{
+			switch (i)
+			{
+			case 0:
+				return SAT_AX;
+				break;
+			case 1:
+				return SAT_AY;
+				break;
+			case 2:
+				return SAT_AZ;
+				break;
+			}
+		}
+	}
+
+	//Test axes L = Bx, L = By, L = Bz
+	for (int i = 0; i < 3; i++) {
+		radius = halfWidth[0] * rotMatAbsVal[0][i] + halfWidth[1] * rotMatAbsVal[1][i] + halfWidth[2] * rotMatAbsVal[2][i];
+		radiusOther = halfWidthOther[i];
+		if (glm::abs(translation[0] * rotMat[0][i] + translation[1] * rotMat[1][i] + translation[2] * rotMat[2][i]) > radius + radiusOther)
+		{
+			switch (i)
+			{
+			case 0:
+				return SAT_BX;
+				break;
+			case 1:
+				return SAT_BY;
+				break;
+			case 2:
+				return SAT_BZ;
+				break;
+			}
+		}
+	}
+
+	//Test axes L = Ax x Bx
+	radius = halfWidth[1] * rotMatAbsVal[2][0] + halfWidth[2] * rotMatAbsVal[1][0];
+	radiusOther = halfWidthOther[1] * rotMatAbsVal[0][2] + halfWidthOther[2] * rotMatAbsVal[0][1];
+	if(glm::abs(translation[2] * rotMat[1][0] - translation[1] * rotMat[2][0]) > radius + radiusOther)
+	{
+		return SAT_AXxBX;
+	}
+
+	//Test axes L = Ax x By
+	radius = halfWidth[1] * rotMatAbsVal[2][1] + halfWidth[2] * rotMatAbsVal[1][1];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[0][2] + halfWidthOther[2] * rotMatAbsVal[0][0];
+	if (glm::abs(translation[2] * rotMat[1][1] - translation[1] * rotMat[2][1]) > radius + radiusOther)
+	{
+		return SAT_AXxBY;
+	}
+
+	//Test axes L = Ax x Bz
+	radius = halfWidth[1] * rotMatAbsVal[2][2] + halfWidth[2] * rotMatAbsVal[1][2];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[0][1] + halfWidthOther[1] * rotMatAbsVal[0][0];
+	if (glm::abs(translation[2] * rotMat[1][2] - translation[1] * rotMat[2][2]) > radius + radiusOther)
+	{
+		return SAT_AXxBZ;
+	}
+
+	//Test axes L = Ay x Bx
+	radius = halfWidth[0] * rotMatAbsVal[2][0] + halfWidth[2] * rotMatAbsVal[0][0];
+	radiusOther = halfWidthOther[1] * rotMatAbsVal[1][2] + halfWidthOther[2] * rotMatAbsVal[1][1];
+	if (glm::abs(translation[0] * rotMat[2][0] - translation[2] * rotMat[0][0]) > radius + radiusOther)
+	{
+		return SAT_AYxBX;
+	}
+
+	//Test axes L = Ay x By
+	radius = halfWidth[0] * rotMatAbsVal[2][1] + halfWidth[2] * rotMatAbsVal[0][1];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[1][2] + halfWidthOther[2] * rotMatAbsVal[1][0];
+	if (glm::abs(translation[0] * rotMat[2][1] - translation[2] * rotMat[0][1]) > radius + radiusOther)
+	{
+		return SAT_AYxBY;
+	}
+
+	//Test axes L = Ay x Bz
+	radius = halfWidth[0] * rotMatAbsVal[2][2] + halfWidth[2] * rotMatAbsVal[0][2];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[1][1] + halfWidthOther[1] * rotMatAbsVal[1][0];
+	if (glm::abs(translation[0] * rotMat[2][2] - translation[2] * rotMat[0][2]) > radius + radiusOther)
+	{
+		return SAT_AYxBZ;
+	}
+
+	//Test axes L = Az x Bx
+	radius = halfWidth[0] * rotMatAbsVal[1][0] + halfWidth[1] * rotMatAbsVal[0][0];
+	radiusOther = halfWidthOther[1] * rotMatAbsVal[2][2] + halfWidthOther[2] * rotMatAbsVal[2][1];
+	if (glm::abs(translation[1] * rotMat[0][0] - translation[0] * rotMat[1][0]) > radius + radiusOther)
+	{
+		return SAT_AZxBX;
+	}
+
+	//Test axes L = Az x By
+	radius = halfWidth[0] * rotMatAbsVal[1][1] + halfWidth[1] * rotMatAbsVal[0][1];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[2][2] + halfWidthOther[2] * rotMatAbsVal[2][0];
+	if (glm::abs(translation[1] * rotMat[0][1] - translation[0] * rotMat[1][1]) > radius + radiusOther)
+	{
+		return SAT_AZxBY;
+	}
+
+	//Test axes L = Az x Bz
+	radius = halfWidth[0] * rotMatAbsVal[1][2] + halfWidth[1] * rotMatAbsVal[0][2];
+	radiusOther = halfWidthOther[0] * rotMatAbsVal[2][1] + halfWidthOther[1] * rotMatAbsVal[2][0];
+	if (glm::abs(translation[1] * rotMat[0][2] - translation[0] * rotMat[1][2]) > radius + radiusOther)
+	{
+		return SAT_AZxBZ;
+	}
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
