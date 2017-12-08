@@ -27,7 +27,6 @@ void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
-
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	
